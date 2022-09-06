@@ -1,11 +1,10 @@
-import {None} from 'common_types';
 import {ValidationError} from 'domain/error';
 
 export type User = {
   id: string;
   email: string;
   password: string;
-  name: string | None;
+  name?: string;
 };
 
 export function new_user(
