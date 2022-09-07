@@ -1,6 +1,6 @@
 import {UserRepository} from 'adapters/user_repository';
 import {ValidationError} from 'domain/error';
-import {new_user} from 'domain/model';
+import {new_user, User} from 'domain/model';
 import {v4 as uuidv4} from 'uuid';
 import {EmailAlreadyExists, RepositoryError} from './error';
 
@@ -32,29 +32,9 @@ export function create_user(
   const id = id_factory();
   const crypto_password = req.password;
 
+  let user: User;
   try {
-    const user = new_user(id, req.email, crypto_password, req.name);
-    const existent_user = repo.get_by_email(req.email);
-    if (existent_user) {
-      return {
-        tag: 'error',
-        error: new EmailAlreadyExists(`email: ${req.email}`),
-      };
-    }
-
-    const has_persisted = repo.add(user);
-
-    if (!has_persisted) {
-      return {
-        tag: 'error',
-        error: new RepositoryError('could not save user on storage'),
-      };
-    }
-
-    return {
-      tag: 'success',
-      id: user.id,
-    };
+    user = new_user(id, req.email, crypto_password, req.name);
   } catch (err) {
     if (err instanceof ValidationError) {
       return {
@@ -65,4 +45,25 @@ export function create_user(
 
     throw err;
   }
+
+  const existent_user = repo.get_by_email(req.email);
+  if (existent_user) {
+    return {
+      tag: 'error',
+      error: new EmailAlreadyExists(`email: ${req.email}`),
+    };
+  }
+
+  const has_persisted = repo.add(user);
+  if (!has_persisted) {
+    return {
+      tag: 'error',
+      error: new RepositoryError('could not save user on storage'),
+    };
+  }
+
+  return {
+    tag: 'success',
+    id: user.id,
+  };
 }
