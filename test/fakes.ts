@@ -1,7 +1,7 @@
 import {UserRepository} from '../src/adapters/user_repository';
 import {User} from '../src/domain/model';
 
-export class InMemoryUserRepo implements UserRepository {
+export class FakeUserRepo implements UserRepository {
   private users: Record<string, User> = {};
 
   add(user: User): boolean {

@@ -1,5 +1,5 @@
 import {create_user} from '../../src/service_layer/services';
-import {InMemoryUserRepo} from '../fakes';
+import {FakeUserRepo} from '../fakes';
 
 describe('create user', () => {
   it('should return user id', () => {
@@ -9,7 +9,7 @@ describe('create user', () => {
         password: '1234',
         name: 'user',
       },
-      new InMemoryUserRepo(),
+      new FakeUserRepo(),
       () => '1'
     );
 
@@ -25,7 +25,7 @@ describe('create user', () => {
       password: '1234',
       name: 'user',
     };
-    const repo = new InMemoryUserRepo();
+    const repo = new FakeUserRepo();
     create_user(user, repo);
 
     const result = create_user(user, repo);
@@ -40,7 +40,7 @@ describe('create user', () => {
         password: '1234',
         name: 'user',
       },
-      new InMemoryUserRepo()
+      new FakeUserRepo()
     );
 
     if (result.tag === 'success') {
