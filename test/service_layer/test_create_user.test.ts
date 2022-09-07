@@ -1,4 +1,5 @@
 import {create_user} from '../../src/service_layer/services';
+import {InMemoryUserRepo} from '../fakes';
 
 describe('create user', () => {
   it('should return user id', () => {
@@ -8,21 +9,44 @@ describe('create user', () => {
         password: '1234',
         name: 'user',
       },
+      new InMemoryUserRepo(),
       () => '1'
     );
 
     expect(result).toEqual({
+      tag: 'success',
       id: '1',
     });
   });
 
-  it('should use a default id factory even if none is provided', () => {
-    const result = create_user({
+  it('should return error if email already exists', () => {
+    const user = {
       email: 'test@gmail.com',
       password: '1234',
       name: 'user',
-    });
+    };
+    const repo = new InMemoryUserRepo();
+    create_user(user, repo);
 
-    expect(result.id).toBeDefined();
+    const result = create_user(user, repo);
+
+    expect(result.tag).toEqual('error');
+  });
+
+  it('should use a default id factory even if none is provided', () => {
+    const result = create_user(
+      {
+        email: 'test@gmail.com',
+        password: '1234',
+        name: 'user',
+      },
+      new InMemoryUserRepo()
+    );
+
+    if (result.tag === 'success') {
+      expect(result.id).toBeDefined();
+    } else {
+      fail('it should be success');
+    }
   });
 });
